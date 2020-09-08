@@ -13,7 +13,7 @@ scan      = 5e-2    # MHz
 fl        = 749     # MHz
 fr        = 751     # MHz
 bandwidth = 125e-6#(fr-fl)/(N-1)  # MHz
-shift     = 2e-2    # MHz
+shift     = 2e-3    # MHz
 sigma     = kb*T*bandwidth*1e6/sqrt(N-1) # sigma
 
 print(bandwidth)
@@ -45,7 +45,7 @@ def single_bin():
     bin_pos = x[bin_index]                # bin x axis
 
     noise = np.random.normal(0,sigma,N) # noise
-    bin_pow = 5#max(noise) #abs(noise[bin_index]) # signal power
+    bin_pow = 2#max(noise) #abs(noise[bin_index]) # signal power
     
     print(step)
     #fig, ax = subplots()
@@ -104,44 +104,41 @@ def single_bin():
 
             ylim(-8,12)
             savefig(f"subgle_bin/{i}.png")
-            pause(0.01)
+            #pause(0.01)
 
-    figure()
-    gx = subplot(121)
-    max_pow = argmax(nowei_array)
-    title(f"no weight Max : {x[max_pow]:8.5f}")
+    # figure()
+    # gx = subplot(121)
+    # max_pow = argmax(nowei_array)
+    # title(f"no weight Max : {x[max_pow]:8.5f}")
     
-    plot([bin_pos,bin_pos],[min(nowei_array/addti_array),max(nowei_array/addti_array)],"r--")
-    plot(x,nowei_array/addti_array)#/max(nowei_array/addti_array)*max(grand_array/weigh_array))
+    # plot([bin_pos,bin_pos],[min(nowei_array/addti_array),max(nowei_array/addti_array)],"r--")
+    # plot(x,nowei_array/addti_array)#/max(nowei_array/addti_array)*max(grand_array/weigh_array))
 
-    print(addti_array[-1])
-    xlabel("Frequency[MHz]")
-    ylabel("$power\t[10^{-22}]$")
-    subplot(122,sharex=gx,sharey=gx)
+    # print(addti_array[-1])
+    # xlabel("Frequency[MHz]")
+    # ylabel("$power\t[10^{-22}]$")
+    # subplot(122,sharex=gx,sharey=gx)
     
-    max_pow = argmax((grand_array/weigh_array)[each_len:-each_len])+each_len
-    title(f"weight Max : {x[max_pow]:8.5f}")
-    plot([bin_pos,bin_pos],[min(grand_array/weigh_array),max(grand_array/weigh_array)],"r--")
-    plot(x,grand_array/weigh_array)
-    xlabel("Frequency[MHz]")
+    # max_pow = argmax((grand_array/weigh_array)[each_len:-each_len])+each_len
+    # title(f"weight Max : {x[max_pow]:8.5f}")
+    # plot([bin_pos,bin_pos],[min(grand_array/weigh_array),max(grand_array/weigh_array)],"r--")
+    # plot(x,grand_array/weigh_array)
+    # xlabel("Frequency[MHz]")
 
     figure()
     gx = subplot(121)
     max_pow = argmax(nowei_array)
     title(f"no weight Max : {x[max_pow]:8.5f}")
     gra_snr = (grand_array/sqrt(sigm1_array))
-    now_snr = (nowei_array/sqrt(sigm2_array))#[each_len:-each_len]
-    new_x = x#[each_len:-each_len]
-    #plot([bin_pos,bin_pos],[min(now_snr),max(now_snr)],"r--")
-    plot(new_x,now_snr)#/max(now_snr) * max(gra_snr))
+    now_snr = (nowei_array/sqrt(sigm2_array))
+    new_x = x
+    plot(new_x,now_snr)
     
     xlabel("Frequency[MHz]")
     ylabel("SNR")
     subplot(122,sharex=gx,sharey=gx)
-    #plot([bin_pos,bin_pos],[min(gra_snr),max(gra_snr)],"r--")
-    #[each_len:-each_len]
     plot(new_x,gra_snr)
-    max_pow = argmax(gra_snr[each_len:-each_len])+each_len
+    max_pow = argmax(grand_array)#+each_len
     
     title(f"weight Max : {new_x[max_pow]:8.5f}")
     xlabel("Frequency[MHz]")
