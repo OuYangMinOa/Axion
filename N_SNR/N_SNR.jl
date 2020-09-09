@@ -5,7 +5,7 @@ using PyCall
 pltt.style.use("dark_background")
 pygui(true)
 
-t  = 3600    # one hour (s)
+t  = 3600     # one hour (s)
 ρₐ = 0.45    # axion density (GeV/cc)
 f  = 5       # 5Ghz Frequency (10⁹ Hz)
 m  = 2.06e-5 # ma (ev)
@@ -42,20 +42,21 @@ function N_SNR()
         target_SNR_14[i] = N_to_SNR_1(SNR[i], g_target_14)
         
     end
-    yscale("log")
-    grid()
-    plot(SNR,KSVZ_SNR)
-    plot(SNR,target_SNR_13,"g")
-    plot(SNR,target_SNR_14,"r")
+    println(N_to_SNR_1(4, g_KSVZ))
+    grid(zorder=0)
+    plot(SNR,KSVZ_SNR,color="#2b79ff")
+    plot(SNR,target_SNR_13,"#54ffaa")
+    plot(SNR,target_SNR_14,"#ff5454")
     #plot(SNR,DFSZ_SNR)
     title("N v.s. SNR")
     xlabel("SNR")
     ylabel("N")
-
-    fill_between(SNR,KSVZ_SNR,target_SNR_14, alpha = 1, label = "KSVZ")
+    yscale("log")
+    xlim(0,10)
+    fill_between(SNR,KSVZ_SNR,target_SNR_14, alpha = 0.8,color="#2b79ff", label = "KSVZ")
     
-    fill_between(SNR,target_SNR_14,target_SNR_13, alpha = 1,color="r", label = L"target $g_{\alpha\gamma\gamma}=3x10^{-14}$")
-    fill_between(SNR,target_SNR_13,minimum(target_SNR_13), alpha = 1,color="g", label = L"target $g_{\alpha\gamma\gamma}=3x10^{-13}$")
+    fill_between(SNR,target_SNR_14,target_SNR_13, alpha =  0.8,color="#ff5454", label = L"target $g_{\alpha\gamma\gamma}=3x10^{-14}$")
+    fill_between(SNR,target_SNR_13,minimum(target_SNR_13), alpha =  0.8,color="#54ffaa", label = L"target $g_{\alpha\gamma\gamma}=3x10^{-13}$")
     legend()
 end
 
