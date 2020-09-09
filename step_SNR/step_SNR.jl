@@ -1,11 +1,9 @@
 println("### start ###")
 using PyPlot
-using PyCall
-@pyimport  matplotlib.pyplot as pltt
-pltt.style.use("dark_background")
+plt.style.use("dark_background")
 pygui(true)
 
-N  = 10_000  # N
+N  = 1  # N
 t  = 3600    # one hour (s)
 Δv = N/t     # Δv = N/t
 ρₐ = 0.45    # axion density (GeV/cc)
@@ -21,7 +19,7 @@ s  = 0       # S₁₁
 
 fl = 4.84e9    # left  Hz
 fr = 6.04e9    # right Hz
-scan = 5e4     # 50kHz
+scan = 1e6     # 50kHz
 each_time = 80 # 80 s
 
 g_KSVZ = -0.94 # g_γ KSVZ
@@ -39,10 +37,8 @@ end
 
 
 
-
-
 function step_SNR()
-    SNR  = range(0,10,length = 100000)
+    SNR  = range(0,10,length = 1000)
     KSVZ_SNR = Array{Float64,1}(undef,length(SNR))
     target_SNR_13 = Array{Float64,1}(undef,length(SNR))
     target_SNR_14 = Array{Float64,1}(undef,length(SNR))
@@ -53,19 +49,20 @@ function step_SNR()
     end
 
     yscale("log")
-    grid()
-    plot(SNR,KSVZ_SNR)
-    plot(SNR,target_SNR_13,"g")
-    plot(SNR,target_SNR_14,"r")
+    grid(ls="-", color="0.8")
+    plot(SNR,KSVZ_SNR,"k",color="#2b79ff")
+    plot(SNR,target_SNR_13,"k",color="#54ffaa")
+    plot(SNR,target_SNR_14,"k",color="#ff5454")
     #plot(SNR,DFSZ_SNR)
-
-    fill_between(SNR,target_SNR_13,target_SNR_14, alpha = 1, label = L"target $g_{\alpha\gamma\gamma}=3x10^{-13}$")
+    xlim(0,10)
+    fill_between(SNR,KSVZ_SNR,minimum(KSVZ_SNR), alpha = 0.8,color="#2b79ff", label = "KSVZ")
+    fill_between(SNR,target_SNR_13,target_SNR_14, alpha = 0.8,color="#54ffaa", label = L"target $g_{\alpha\gamma\gamma}=3x10^{-13}$")
     
-    fill_between(SNR,target_SNR_14,KSVZ_SNR, alpha = 1,color="r", label = L"target $g_{\alpha\gamma\gamma}=3x10^{-14}$")
-    fill_between(SNR,KSVZ_SNR,minimum(KSVZ_SNR), alpha = 1,color="g", label = "KSVZ")
+    fill_between(SNR,target_SNR_14,KSVZ_SNR, alpha = 0.8,color="#ff5454", label = L"target $g_{\alpha\gamma\gamma}=3x10^{-14}$")
+    
     title("step v.s. SNR")
     xlabel("SNR")
-    ylabel("step")
+    ylabel("step(Hz)")
     legend()
 end
 
