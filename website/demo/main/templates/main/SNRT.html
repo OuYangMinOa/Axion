@@ -1,0 +1,164 @@
+<head>
+    {% load static %}
+    <!-- Prism CSS -->
+
+    <link href="{% static 'tinymce/css/prism.css' %}" rel="stylesheet">
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Compiled and minified JavaScript for Materialize CSS -->
+    <style type="text/css">
+        .css-input { 
+                text-align:center; 
+              }
+        #demoFont {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 25px;
+            letter-spacing: 0px;
+            word-spacing: 0px;
+            color: #000000;
+            font-weight: 400;
+            text-decoration: none solid rgb(68, 68, 68);
+            font-style: normal;
+            font-variant: normal;
+            text-transform: none;
+            }
+    </style>
+    <style type="text/css">
+        <!--
+        #B ul li {
+        　display:inline;
+        }
+        -->
+        </style>
+    <style type="text/css">
+        .myButton {
+            box-shadow:inset 0px -16px 10px 0px #29bbff;
+            background:linear-gradient(to bottom, #2dabf9 5%, #0688fa 100%);
+            background-color:#2dabf9;
+            border-radius:3px;
+            border:1px solid #0b0e07;
+            display:inline-block;
+            cursor:pointer;
+            color:#ffffff;
+            font-family:Arial;
+            font-size:28px;
+            padding:20px 30px;
+            text-decoration:none;
+            text-shadow:0px 0px 50px #263666;
+        }
+        .myButton:hover {
+            background:linear-gradient(to bottom, #0688fa 5%, #2dabf9 100%);
+            background-color:#0688fa;
+        }
+        .myButton:active {
+            position:relative;
+            top:1px;
+        }
+        .space-around{
+            justify-content:space-around;
+            display:flex;
+            margin:30px;
+            }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    
+</head>
+
+<body >
+    
+    <nav>
+        <div class="nav-wrapper">
+          <a href="../" class="brand-logo"> &nbsp&nbspSNR vs T<TABLE></TABLE> </a>
+          <ul id="nav-mobile" class="right hide-on-med-and-down">
+            <li><a href="/">made by OuYang</a></li>
+          </ul>
+        </div>
+  </nav>
+
+      <div class="container">
+        <!-- Page Content goes here -->
+        
+        
+        <form method='POST'>
+        {% csrf_token %}
+        <table class="centered">
+        <tbody >
+        <tr>
+            <th ><div id="demoFont">scan range</div></th >
+            <th ><input class = "css-input" type="text" name="scan_range" placeholder="The range we scan" value="50000"></th >
+            <th ><div id="demoFont">step size</div></th >
+            <th ><input class = "css-input" type="text" name="step_size" placeholder="The bandwidth we shift the resonance frequency" value="2000"></th >
+            <th ><div id="demoFont">Δv</div></th >
+            <th ><input class = "css-input" type="text" name="delta_v" placeholder="Determind by (single bin) or (intrinsic width) or (cavity width)" value="50000"></th>
+            <th ><div id="demoFont">ρₐ</div></th >
+            <th ><input class = "css-input" type="text" name="rho_a" placeholder="The density of Axion" value="0.45"></th >
+            <th ><div id="demoFont">f</div></th >
+            <th ><input class = "css-input" type="text" name="f" placeholder="Frequency(5GHz)" value="5"></th >
+            
+        </tr> 
+        <tr>
+            <th ><div id="demoFont">B</div></th >
+            <th ><input class = "css-input" type="text" name="B" placeholder="Magnetic field (T)" value="9"></th >
+
+            <th ><div id="demoFont">V</div></th >
+            <th ><input class = "css-input" type="text" name="V" placeholder="The volume of the cavity" value="1"></th >
+            <th ><div id="demoFont">T</div></th >
+            <th ><input class = "css-input" type="text" name="T" placeholder="Temperature (k)" value="0.24"></th >
+            <th ><div id="demoFont">Q</div></th >
+            <th ><input class = "css-input" type="text" name="Q" placeholder="Q value" value="50000"></th >
+            <th ><div id="demoFont">c</div></th >
+            <th ><input class = "css-input" type="text" name="c" placeholder="Cmnp" value="0.5"></th >
+                </tr> 
+        <tr>
+            <th ><div id="demoFont">s</div></th >
+            <th ><input class = "css-input" type="text" name="s" placeholder="S11" value="0"></th >
+        </tr>
+        </tbody >
+        </table>
+
+        <br><br>
+        <button class = "myButton" type='submit' value="" onclick="save()">Plot!!</button>
+        &nbsp&nbsp
+        <a class = "myButton" href="../">Back</a>
+        <br>
+        </form>
+
+            {% if img is not None %}
+            <img src="{{ img }}" width="1000px"/>
+            {% endif %}
+
+            <div id = "myplot"></div>
+
+            <script type="text/javascript">    
+                scrollInterval = setInterval(function(){
+                    tim += 1
+                    if ( tim < total) {
+                                window.scrollBy( 0, scrollStep  );
+                    }
+                    else{
+                        clearInterval(scrollInterval);
+                    }
+                },15); 
+                    var Height = document.getElementById("myplot").offsetTop  ;
+                    var scrollStep = Height / (500 / 15);
+                    var tim = 0, total = 500 / 15;
+                    console.log(scrollStep,Height)
+                var object = ["scan_range","step_size","delta_v","rho_a","f","B","V","T","Q","c","s"];
+                function save(){
+                    for(i in object){
+                        localStorage.setItem(object[i],document.getElementsByName(object[i])[0].value);
+                        console.log(localStorage.getItem(object[i]));
+                    }
+                }
+
+                for(i in object){
+                    if (localStorage.getItem(object[i]) != null) {
+                        document.getElementsByName(object[i])[0].value = localStorage.getItem(object[i]) ;
+                    }
+                }
+                </script>
+
+      </div>
+    </body>
+
+
