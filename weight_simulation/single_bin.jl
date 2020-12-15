@@ -708,7 +708,11 @@ end
     gra_sig = copy(gra_y)
     rescan(gra_candidate,gra_y,gra_w,gra_sig)
 
-
+    if (change2 == 0)
+        cut_s = SNR
+    elseif (change2 !=-1)
+        cut_s = change2
+    end
 
     gra_snr_recan = (gra_y./sqrt.(gra_sig))[show_x]
     candidate_number_1_rescan, gra_candidate_rescan = cutting(gra_snr_recan, cut_s)
@@ -733,10 +737,10 @@ end
 
     # combined
 
-    if (change2 == 0)
+    if (change == 0)
         cut_s = SNR
-    elseif (change !=-1)
-        cut_s = change2
+    else
+        cut_s = change
     end
 
     gra_snr_combine_y = coadd(gra_snr,M_num)
@@ -746,6 +750,12 @@ end
     gra_combine_w   = copy(gra_combine_y)
     gra_combine_sig = copy(gra_combine_y)
     rescan(gra_combine_candidate,gra_combine_y,gra_combine_w,gra_combine_sig)
+
+    if (change2 == 0)
+        cut_s = SNR
+    elseif (change2 !=-1)
+        cut_s = change2
+    end
 
     gra_combine_snr_recan = (gra_combine_y./sqrt.(gra_combine_sig))[show_x]
     gra_combine_snr_recan = coadd(gra_combine_snr_recan,M_num)
@@ -886,6 +896,11 @@ end
     gra_sig = copy(gra_y)
     rescan(gra_candidate,gra_y,gra_w,gra_sig)
 
+    if (change2 == 0)
+        cut_s = SNR
+    elseif (change2 != -1)
+        cut_s = change2
+    end
 
     gra_snr_recan = (gra_y./sqrt.(gra_sig))[show_x]
     candidate_number_1_rescan, gra_candidate_rescan = cutting(gra_snr_recan, cut_s)
@@ -910,10 +925,12 @@ end
 
     # combined
 
-    if (change2 == 0)
+
+
+    if (change == 0)
         cut_s = SNR
-    elseif (change2 != -1)
-        cut_s = change2
+    else
+        cut_s = change
     end
 
     gra_snr_combine_y = coadd(gra_snr,M_num)
@@ -927,6 +944,12 @@ end
     gra_combine_w   = copy(gra_combine_y)
     gra_combine_sig = copy(gra_combine_y)
     rescan(gra_combine_candidate,gra_combine_y,gra_combine_w,gra_combine_sig)
+
+    if (change2 == 0)
+        cut_s = SNR
+    elseif (change2 != -1)
+        cut_s = change2
+    end
 
     gra_combine_snr_recan = (gra_combine_y./sqrt.(gra_combine_sig))[show_x]
     gra_combine_snr_recan = coadd(gra_combine_snr_recan,M_num)
@@ -1436,7 +1459,7 @@ end
     SRN_len = 10
     total = 200
 
-    println("Predict time = $(onetime*SRN_len*total)s")
+    println(" ($(change),$(change2))Predict time = $(onetime*SRN_len*total)s")
     
     file = "rescan_SIX_$(change)_$(change2)_$(bandwidth).csv"
     file_name = "C:\\Users\\$(splitdir(homedir())[end])\\OneDrive - cc.ncu.edu.tw\\研究\\for_git\\weight_simulation\\julia_sim_data\\rescan_3D\\$file"
@@ -1494,15 +1517,18 @@ end
 
     cut1 = collect(range(1.0,5.0,length=50))
     cut2 = collect(range(1.0,5.0,length=50))
-    SNR = collect(range(1,5,length=50))
+    SNR = collect(range(1,5,length=10))
 
     Z_1 = Array{Float64,3}(undef,length(cut1),length(cut2),length(SNR))
     Z_2 = Array{Float64,3}(undef,length(cut1),length(cut2),length(SNR))
     Z_3 = Array{Float64,3}(undef,length(cut1),length(cut2),length(SNR))
     Z_4 = Array{Float64,3}(undef,length(cut1),length(cut2),length(SNR))
 
-    X, Y = repeat(SNR', length(cut1), 1), repeat(cut1, 1, length(SNR))
+    # cut1 cut2
+    X, Y = repeat(cut1', length(cut2), 1), repeat(cut2, 1, length(cut1))
 
+    # snr cut1
+    # X, Y = repeat(SNR', length(cut1), 1), repeat(cut1, 1, length(SNR))
     
     which = "combine"
 
@@ -1524,7 +1550,7 @@ end
         end #end for
     end #end for
 
-    figure()
+    # figure()
     
     color_max = maximum(Z_2)
     color_min = minimum(Z_2)
@@ -1534,17 +1560,25 @@ end
 
     Z_same = Array{Float64,2}(undef,length(cut1),length(cut2))
 
-    for sss in 1:length(cut1)
-        # file = "SNR=$(SNR[sss]).png"
-        # SAVE_FLODER = "C:\\Users\\$(splitdir(homedir())[end])\\OneDrive - cc.ncu.edu.tw\\研究\\for_git\\weight_simulation\\julia_sim_data\\rescan_3D_contourf\\$file"
-        Z_same[sss,:] = Z_2[sss,sss,:]
+
+
+    for sss in 1:length(cut2)
+        figure()
+        file = "SNR=$(SNR[sss]).png"
+        title("SNR = $(SNR[sss])")
+        SAVE_FLODER = "C:\\Users\\$(splitdir(homedir())[end])\\OneDrive - cc.ncu.edu.tw\\研究\\for_git\\weight_simulation\\julia_sim_data\\rescan_3D_contourf\\$file"
+        Z_same = Z_2[:,:,sss]'
+        # println(size(Z_same))
+        color_max = maximum(Z_same)
+        color_min = minimum(Z_same)
+        clev = range(color_min,step=color_max/1000,color_max)
+        contourf(X,Y,Z_same,clev, cmap = "jet")
+        xlabel("cut1")
+        ylabel("cut2")
+        ticks = range(color_min,length=10,color_max)
+        colorbar(fraction=0.03, pad=0.04,ticks = ticks)
     end
-    color_max = maximum(Z_same)
-    color_min = minimum(Z_same)
-    clev = range(color_min,step=color_max/1000,color_max)
-    contourf(X,Y,Z_same,clev, cmap = "jet")
-    ticks = range(color_min,length=10,color_max)
-    colorbar(fraction=0.03, pad=0.04,ticks = ticks)
+    
     #     color_max = maximum(Z_2)
     # color_min = minimum(Z_2)
 
@@ -1560,8 +1594,6 @@ end
     #     # clev = range(color_min,step=color_max/10000,color_max)
     #     contourf(X,Y,Z_2[:,change2,:].+cut2[change2],clev.+cut2[change2], cmap = "jet")
     # end #end for
-
-
 end
 
 
@@ -1609,18 +1641,18 @@ end
 #     end
 # end
 
-@everywhere poss = []
-for i in range(1,5,length=50)
-    for j in range(1,5,length=50)
-        append!(poss,[(i,j)])
-    end 
-end
-@time begin
-    @sync @distributed for (i,j) in poss
-        @async rescan_plan_3D(i,j)
-    end
+# @everywhere poss = []
+# for i in range(1,5,length=50)
+#     for j in range(1,5,length=50)
+#         append!(poss,[(i,j)])
+#     end 
+# end
+# @time begin
+#     @sync @distributed for (i,j) in poss
+#         @async rescan_plan_3D(i,j)
+#     end
     
-end
+# end
 
 
 # @sync @distributed for i in 25:25:200
